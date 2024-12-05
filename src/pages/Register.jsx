@@ -1,25 +1,44 @@
-// import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../provider/AuthProvider";
 
 const Register = () => {
-  const { createNewUser } = useContext(AuthContext);
+  const Navgate = useNavigate();
+  const { createNewUser, profileUpdate } = useContext(AuthContext);
+  const [errorMsg, setErrorMsg] = useState({});
   const handleFormData = (e) => {
     e.preventDefault();
+    setErrorMsg({});
 
     const form = new FormData(e.target);
     const name = form.get("name");
+    if (name.length < 5) {
+      setErrorMsg({ ...errorMsg, name: " name Must be 5 char!" });
+      return;
+    }
     const photo = form.get("photo");
     const email = form.get("email");
     const password = form.get("password");
+    const profile = {
+      displayName: name,
+      photoURL: photo,
+    };
     // console.log({ name, photo, email, password });
     createNewUser(email, password)
       .then((result) => {
         console.log(result.user);
+        e.target.reset();
+        Navgate("/");
+        profileUpdate(profile)
+          .then(() => {
+            alert("Succsessfully profile updated");
+          })
+          .catch((error) => console.log(error));
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
+        setErrorMsg({ ...errorMsg, err: error.code });
       });
   };
 
@@ -42,6 +61,9 @@ const Register = () => {
               required
             />
           </div>
+          <label className="label text-start text-red-700 capitalize">
+            <p>{errorMsg && errorMsg.name}</p>
+          </label>
           <div className="form-control ">
             <label className="label">
               <span className="label-text ">Photo URL</span>
@@ -54,6 +76,7 @@ const Register = () => {
               required
             />
           </div>
+
           <div className="form-control ">
             <label className="label">
               <span className="label-text ">Email</span>
@@ -82,17 +105,22 @@ const Register = () => {
                 Forgot password?
               </a>
             </label>
+            {errorMsg.err && (
+              <h1 className="text-start text-red-600 capitalize">
+                {errorMsg.err}
+              </h1>
+            )}
           </div>
           <div className="form-control mt-6">
             <button className="btn btn-neutral rounded-none ">Register</button>
           </div>
         </form>
-        {/* <h1 className="font-bold">
-          Dont’t Have An Account ?{" "}
-          <Link to="/auth/register" className="text-red-600 ">
-            Register
+        <h1 className="font-bold">
+          Already Have An Account ?{" "}
+          <Link to="/auth/login" className="text-red-600 ">
+            Login
           </Link>{" "}
-        </h1> */}
+        </h1>
       </div>
     </div>
   );

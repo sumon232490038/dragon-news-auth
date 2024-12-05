@@ -1,9 +1,14 @@
-import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../provider/AuthProvider";
 
 const Login = () => {
   const { signIn, setUser } = useContext(AuthContext);
+  const [loginError, setLoginError] = useState("");
+  const location = useLocation();
+  console.log(location);
+
+  const Navigate = useNavigate();
   const handleLoginForm = (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
@@ -13,8 +18,12 @@ const Login = () => {
     signIn(email, password)
       .then((result) => {
         setUser(result.user);
+        e.target.reset();
+        Navigate(location?.state ? location.state : "/");
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        setLoginError(error.code);
+      });
   };
   return (
     <div className="pb-10">
@@ -46,10 +55,10 @@ const Login = () => {
               className="input input-bordered"
               required
             />
-            <label className="label">
-              <a href="#" className="label-text-alt link link-hover">
-                Forgot password?
-              </a>
+            <label className="label text-start">
+              <p className="text-red-800 text-start capitalize ">
+                {loginError}
+              </p>
             </label>
           </div>
           <div className="form-control mt-6">

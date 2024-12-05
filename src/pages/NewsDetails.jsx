@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import RightNav from "../components/layout-component/RightNav";
 import { Link } from "react-router-dom";
@@ -6,6 +6,8 @@ import { FaArrowLeft } from "react-icons/fa";
 
 const NewsDetails = () => {
   const data = useLoaderData();
+  const location = useLocation();
+  console.log(location);
   //   console.log(data.data[0]);
   const news = data.data[0];
   return (
